@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -17,10 +16,9 @@ namespace ShutdownGuiTool
 		private const int HIGH_S = 20;
 		private const int HIGH_L = 23;
 		private const int WIDE_S = 30;
-		private const int WIDEx = 15;//I don't know why the location of the buttons on the last line is not right.
-		/**/
-		private const int FORMWIDE = BLANK_L * 2 + BLANK_S * 5 + WIDE_L * 3 + WIDE_S * 3;
-		private const int FORMHIGH = BLANK_L * 3 + BLANK_S * 2 + HIGH_S * 3 + HIGH_L;
+
+		private const int FORMWIDE = BLANK_L * 2 + BLANK_S * 5 + WIDE_L * 3 + WIDE_S * 3 + 15;
+		private const int FORMHIGH = BLANK_L * 3 + BLANK_S * 3 + HIGH_S * 3 + HIGH_L * 2 + 40;
 		/// <summary>
 		/// time
 		/// </summary>
@@ -89,30 +87,35 @@ namespace ShutdownGuiTool
 		};
 		private Button buttonResetTime = new Button()
 		{
-			Location = new Point(BLANK_L, BLANK_L * 2 + BLANK_S * 2 + HIGH_S * 2 + HIGH_L),
+			Location = new Point(BLANK_L, BLANK_L * 2 + BLANK_S * 3 + HIGH_S * 2 + HIGH_L * 2),
 			Size = new Size(WIDE_L, HIGH_L),
 			Text = "重置"
 		};
 
 		private Button buttonShutdown = new Button()
 		{
-			Location = new Point(BLANK_L + BLANK_S * 5 + WIDE_L * 2 + WIDE_S * 3 - WIDEx, BLANK_L * 2 + BLANK_S * 2 + HIGH_S * 2 + HIGH_L),
+			Location = new Point(BLANK_L + BLANK_S * 5 + WIDE_L * 2 + WIDE_S * 3, BLANK_L * 2 + BLANK_S * 3 + HIGH_S * 2 + HIGH_L * 2),
 			Size = new Size(WIDE_L, HIGH_L),
 			Text = "关机"
 		};
 		private Button buttonReboot = new Button()
 		{
-			Location = new Point(BLANK_S * 5 + WIDE_L + WIDE_S * 3 - WIDEx, BLANK_L * 2 + BLANK_S * 2 + HIGH_S * 2 + HIGH_L),
+			Location = new Point(BLANK_S * 5 + WIDE_L + WIDE_S * 3, BLANK_L * 2 + BLANK_S * 3 + HIGH_S * 2 + HIGH_L * 2),
 			Size = new Size(WIDE_L, HIGH_L),
 			Text = "重启"
 		};
 		private Button buttonCancel = new Button()
 		{
-			Location = new Point(BLANK_S * 5 + WIDE_L + WIDE_S * 3 - WIDEx - BLANK_L - WIDE_L, BLANK_L * 2 + BLANK_S * 2 + HIGH_S * 2 + HIGH_L),
+			Location = new Point(BLANK_S * 5 + WIDE_L + WIDE_S * 3 - BLANK_L - WIDE_L, BLANK_L * 2 + BLANK_S * 3 + HIGH_S * 2 + HIGH_L * 2),
 			Size = new Size(WIDE_L, HIGH_L),
 			Text = "取消"
 		};
-
+		private Label labelTime = new Label()
+		{
+			Location = new Point(BLANK_L, BLANK_L * 2 + BLANK_S * 2 + HIGH_S * 2 + HIGH_L),
+			Size = new Size(BLANK_S * 5 + WIDE_L * 3 + WIDE_S * 3, HIGH_L),
+			Text=""
+		};
 		private void setControls()
 		{
 			KeyPressEventHandler onlyNumber = new KeyPressEventHandler((s, e) =>
@@ -177,7 +180,7 @@ namespace ShutdownGuiTool
 			});
 			buttonCancel.Click += new EventHandler((s, e) =>
 			{
-				var pSI = new ProcessStartInfo("shutdown.exe", @"/a" ) { CreateNoWindow = true };
+				var pSI = new ProcessStartInfo("shutdown.exe", @"/a") { CreateNoWindow = true };
 				var p = new Process() { StartInfo = pSI };
 				p.Start();
 			});
@@ -214,6 +217,7 @@ namespace ShutdownGuiTool
 			textboxHour.Text = h.ToString();
 			textboxMinute.Text = m.ToString();
 			textboxSecond.Text = s.ToString();
+			labelTime.Text = DateTime.Now.AddSeconds(delTime).ToLongDateString() + " " + DateTime.Now.AddSeconds(delTime).ToLongTimeString();
 			return;
 		}
 		private void refresh1()
@@ -228,15 +232,16 @@ namespace ShutdownGuiTool
 			textboxHour.Text = h.ToString();
 			textboxMinute.Text = m.ToString();
 			textboxSecond.Text = s.ToString();
+			labelTime.Text = DateTime.Now.AddSeconds(delTime).ToLongDateString() + " " + DateTime.Now.AddSeconds(delTime).ToLongTimeString();
 			return;
 		}
 
 		public MainForm()
 		{
 			Text = "定时关机";
-			Size = new Size(FORMWIDE, FORMHIGH + (this.Height - this.ClientRectangle.Height));/*Todo: Need update.*/
+			Size = new Size(FORMWIDE, FORMHIGH);
 			FormBorderStyle = FormBorderStyle.FixedToolWindow;
-
+			AutoScaleMode = AutoScaleMode.None;
 			setControls();
 
 			Controls.Add(textboxHour);
@@ -252,6 +257,7 @@ namespace ShutdownGuiTool
 			Controls.Add(buttonShutdown);
 			Controls.Add(buttonReboot);
 			Controls.Add(buttonCancel);
+			Controls.Add(labelTime);
 
 			var labelHour = new Label()
 			{
